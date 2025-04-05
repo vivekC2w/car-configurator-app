@@ -1,0 +1,19 @@
+# Node.js
+node_modules/
+
+# Environment variables
+.env
+
+# Build directories
+dist/
+build/
+
+# Local development files
+.DS_Store
+
+# Package lock
+package-lock.json
+
+# System Files
+.DS_Store
+Thumbs.db
