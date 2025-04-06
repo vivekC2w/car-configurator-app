@@ -12,10 +12,9 @@ const configurationSchema = new mongoose.Schema({
     required: true
   },
   color: {
-    name: String,
-    hexCode: String,
-    price: Number
-  },
+    type: mongoose.Schema.Types.ObjectId,
+    ref: 'Color'
+  }, 
   accessories: [{
     _id: false,
     accessory: {

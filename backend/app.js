@@ -10,7 +10,7 @@ const colors = require('./routes/colorRoutes');
 const accessories = require('./routes/accessoryRoutes');
 const features = require('./routes/featureRoutes');
 const categories = require('./routes/categoryRoutes');
-// const configurations = require('./routes/configurationRoutes');
+const configurations = require('./routes/configurationRoutes');
 
 //env variables
 dotenv.config({ path: './.env' });
@@ -32,6 +32,6 @@ app.use('/api/colors', colors);
 app.use('/api/accessories', accessories);
 app.use('/api/features', features);
 app.use('/api/categories', categories);
-// app.use('/api/configurations', configurations);
+app.use('/api/configurations', configurations);
 
 module.exports = app;
