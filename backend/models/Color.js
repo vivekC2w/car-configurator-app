@@ -15,10 +15,11 @@ const colorSchema = new mongoose.Schema({
     required: true,
     min: 0
   },
-  availableOn: [{
+  variantId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'Variant'
-  }]
+    ref: 'Variant',
+    required: true
+  }
 });
 
 module.exports = mongoose.model('Color', colorSchema);

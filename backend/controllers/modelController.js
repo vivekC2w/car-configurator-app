@@ -105,3 +105,28 @@ exports.getModelVariants = async (req, res) => {
         });
     }
 };
+
+//@desc Get Model By Model Name
+//@route GET /api/models/name
+exports.getModelByName = async (req, res) => {
+    try {
+        const modelName = decodeURIComponent(req.params.name);
+        const model = await Model.findOne({ name: modelName });
+        
+        if (!model) {
+            return res.status(404).json({
+                success: false,
+                message: 'Model not found'
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: model
+        });
+    } catch (error) {
+        res.status(400).json({
+            success: false,
+            message: error.message || 'Server Error'
+        });
+    }
+}

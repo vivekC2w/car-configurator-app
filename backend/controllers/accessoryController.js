@@ -84,6 +84,37 @@ exports.getAccessories = async (req, res) => {
     }
 };
 
+// @desc  Get accessories by variant id
+// @route GET /api/accessories/:variantId
+exports.getAccessoriesByVariantId = async (req, res) => {
+    try {
+        const variantId = req.params.variantId;
+        console.log(`Fetching accessories for variant: ${variantId}`);
+
+        const accessories = await Accessory.find({ compatibleVariants: variantId }).populate('compatibleVariants');
+
+        if (!accessories || accessories.length === 0) {
+            return res.status(200).json({ 
+                success: true,
+                data: [],
+                message: 'No accessories found for this variant'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            count: accessories.length,
+            data: accessories
+        });
+    } catch (error) {
+        console.error('Error fetching accessories:', error);
+        res.status(500).json({
+            success: false,
+            message: 'Server Error: ' + error.message
+        });
+    }
+};
+
 // @desc  Get accessory by id
 // @route GET /api/accessories/:id
 exports.getAccessoryById = async (req, res) => {
