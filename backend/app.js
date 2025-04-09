@@ -1,6 +1,9 @@
 const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
+const cookieParser = require('cookie-parser');
 const connectDB = require('./config/db');
 
 //Route files
@@ -19,6 +22,16 @@ dotenv.config({ path: './.env' });
 connectDB();
 
 const app = express();
+
+app.use(helmet());
+
+//Rate limiting
+const limiter = rateLimit({
+    windowMs: 15 * 60 * 1000, // 10 min
+    max: 100,
+    message: 'Too many requests from this IP, please try again in an hour'
+});
+app.use('/api', limiter);
 
 //body parser
 app.use(express.json());

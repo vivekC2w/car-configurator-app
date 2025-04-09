@@ -5,7 +5,6 @@ const Category = require('../models/Category');
 // @access Public
 exports.getCategories = async (req, res) => {
   try {
-    // Optional filtering by type
     const filter = {};
     if (req.query.type) {
       filter.type = req.query.type;

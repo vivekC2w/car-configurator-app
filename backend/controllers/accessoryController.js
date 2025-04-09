@@ -89,7 +89,6 @@ exports.getAccessories = async (req, res) => {
 exports.getAccessoriesByVariantId = async (req, res) => {
     try {
         const variantId = req.params.variantId;
-        console.log(`Fetching accessories for variant: ${variantId}`);
 
         const accessories = await Accessory.find({ compatibleVariants: variantId }).populate('compatibleVariants');
 
