@@ -137,3 +137,43 @@ exports.deleteVariantsByModel = async (req, res) => {
       });
     }
   };
+
+// @desc Search variants by name, model, price range, and accessories
+// @route GET /api/variants/search 
+
+exports.searchVariants = async (req, res, next) => {
+  try {
+    const { query, modelId, minPrice, maxPrice } = req.query;
+    
+    let searchQuery = {};
+    
+    if (query) {
+      searchQuery.$or = [
+        { name: { $regex: query, $options: 'i' } },
+        { description: { $regex: query, $options: 'i' } }
+      ];
+    }
+    
+    if (modelId) {
+      searchQuery.model = modelId;
+    }
+    
+    if (minPrice || maxPrice) {
+      searchQuery.price = {};
+      if (minPrice) searchQuery.price.$gte = Number(minPrice);
+      if (maxPrice) searchQuery.price.$lte = Number(maxPrice);
+    }
+    
+    const variants = await Variant.find(searchQuery)
+      .populate('colors')
+      .populate('accessories');
+    
+    res.status(200).json({
+      success: true,
+      count: variants.length,
+      data: variants
+    });
+  } catch (err) {
+    next(err);
+  }
+};

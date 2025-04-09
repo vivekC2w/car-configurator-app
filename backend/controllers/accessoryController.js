@@ -177,4 +177,47 @@ exports.deleteAccessory = async (req, res) => {
         message: error.message
       });
     }
-  };
+};
+
+exports.searchAccessories = async (req, res) => {
+    try {
+        const { query, category, minPrice, maxPrice } = req.query;
+
+        let searchQuery = {};
+
+        // Text search
+        if (query) {
+          searchQuery.$or = [
+            { name: { $regex: query, $options: "i" } },
+            { description: { $regex: query, $options: "i" } },
+          ];
+        }
+
+        // Category filter
+        if (category) {
+          searchQuery.category = category;
+        }
+
+        // Price range filter
+        if (minPrice || maxPrice) {
+          searchQuery.price = {};
+          if (minPrice) searchQuery.price.$gte = Number(minPrice);
+          if (maxPrice) searchQuery.price.$lte = Number(maxPrice);
+        }
+
+        const accessories = await Accessory.find(searchQuery).populate(
+          "compatibleVariants"
+        );
+
+        res.status(200).json({
+          success: true,
+          count: accessories.length,
+          data: accessories,
+        });
+    } catch (error) {
+        res.status(400).json({
+          success: false,
+          message: error.message,
+        });
+    }
+};

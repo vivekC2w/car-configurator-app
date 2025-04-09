@@ -130,3 +130,45 @@ exports.getModelByName = async (req, res) => {
         });
     }
 }
+
+ // @desc Search models by name, category, and price range
+// @route GET /api/models/search
+exports.searchModels = async (req, res, next) => {
+    try {
+      const { query, category, minPrice, maxPrice } = req.query;
+ 
+      let searchQuery = {};
+      
+      // Text search
+      if (query) {
+        searchQuery.$or = [
+          { name: { $regex: query, $options: 'i' } },
+          { description: { $regex: query, $options: 'i' } }
+        ];
+      }
+      
+      // Category filter
+      if (category) {
+        searchQuery.category = category;
+      }
+      
+      // Price range filter
+      if (minPrice || maxPrice) {
+        searchQuery.price = {};
+        if (minPrice) searchQuery.price.$gte = Number(minPrice);
+        if (maxPrice) searchQuery.price.$lte = Number(maxPrice);
+      }
+      
+      const models = await Model.find(searchQuery)
+        .populate('variants')
+        .populate('accessories');
+      
+      res.status(200).json({
+        success: true,
+        count: models.length,
+        data: models
+      });
+    } catch (err) {
+      next(err);
+    }
+  };
