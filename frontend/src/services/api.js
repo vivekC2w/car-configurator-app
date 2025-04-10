@@ -93,4 +93,45 @@ export const fetchModels = async () => {
     }
   } 
 
+  export const searchModels = async (query, filters = {}) => {
+    try {
+      const params = new URLSearchParams({ query });
+      if (filters.minVariantPrice) params.append('minVariantPrice', filters.minVariantPrice);
+      if (filters.maxVariantPrice) params.append('maxVariantPrice', filters.maxVariantPrice);
+      
+      const response = await api.get(`/models/search?${params}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Model search failed');
+    }
+  };
+  
+  export const searchVariants = async (modelId, filters = {}) => {
+    try {
+      const params = new URLSearchParams();
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) params.append(key, value);
+      });
+      
+      const response = await api.get(`/variants/search/?${params}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Variant search failed');
+    }
+  };
+  
+  export const searchAccessories = async (query, filters = {}) => {
+    try {
+      const params = new URLSearchParams({ query });
+      Object.entries(filters).forEach(([key, value]) => {
+        if (value) params.append(key, value);
+      });
+      
+      const response = await api.get(`/accessories/search?${params}`);
+      return response.data;
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Accessory search failed');
+    }
+  };
+
 export default api;

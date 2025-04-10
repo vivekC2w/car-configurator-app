@@ -1,79 +1,150 @@
+import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useModels } from "../../context/ModelsContext";
+import SearchBar from "../../components/Search/SearchBar";
 
-export default function Header({setIsOpen}) {
+export default function Header({ setIsOpen }) {
   const navigate = useNavigate();
   const { models = [], loading, error } = useModels();
+  const [showSearchExpanded, setShowSearchExpanded] = useState(false);
+  const searchContainerRef = useRef(null);
+  const searchTriggerRef = useRef(null);
 
-  if (loading) return <div style={{ color: 'white', padding: '10px' }}>Loading models...</div>;
-  if (error) return <div style={{ color: 'red', padding: '10px' }}>Error: {error}</div>;
+  // Closing search panel when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event) => {
+      // Checking if click is outside both the search container and the trigger
+      if (
+        searchContainerRef.current && 
+        !searchContainerRef.current.contains(event.target) &&
+        searchTriggerRef.current &&
+        !searchTriggerRef.current.contains(event.target)
+      ) {
+        setShowSearchExpanded(false);
+      }
+    };
+
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => {
+      document.removeEventListener("mousedown", handleClickOutside);
+    };
+  }, []);
 
   const navElements = [
     { label: "CARCONFIG", route: "/", style: { marginRight: "auto" } },
     ...models.map(model => ({
       label: model.name,
       route: `/${model.name.replace(/\s+/g, '').toLowerCase()}`
-    })),
-    { label: "SearchBar", route: null, style: { marginLeft: "auto" } },
-    { label: "Menu", route: null },
+    }))
   ];
 
+  if (loading) return <div style={{ color: 'white', padding: '10px' }}>Loading models...</div>;
+  if (error) return <div style={{ color: 'red', padding: '10px' }}>Error: {error.message}</div>;
+
   return (
-    <>
-      <nav>
-        <ul
-          className="header"
-          style={{
+    <nav>
+      <ul
+        style={{
+          display: "flex",
+          alignItems: "center",
+          padding: "10px",
+          margin: 0,
+          listStyle: "none",
+          backgroundColor: "rgba(0, 0, 0, 0.7)",
+          position: "sticky",
+          top: 0,
+          zIndex: 100,
+          backdropFilter: "blur(5px)",
+        }}
+      >
+        {/* Logo and Model Links */}
+        {navElements.map((element, index) => (
+          <li
+            key={index}
+            onClick={() => navigate(element.route)}
+            style={{
+              cursor: "pointer",
+              padding: "10px",
+              transition: "all 0.3s",
+              borderRadius: "10px",
+              ...element.style,
+              ...(index === 0 && {
+                fontSize: "26px",
+                fontWeight: "bold",
+                fontFamily: "'Segoe UI', sans-serif",
+              }),
+            }}
+            onMouseEnter={(e) => (e.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)")}
+            onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+          >
+            {element.label}
+          </li>
+        ))}
+
+        {/* Search Trigger */}
+        <li 
+          ref={searchTriggerRef}
+          style={{ 
+            marginLeft: "auto",
+            position: "relative",
             display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            padding: "10px",
-            margin: "0",
-            listStyle: "none",
+            alignItems: "center"
           }}
         >
-          {navElements.map((element, index) => (
-            <li
-              key={index}
-              onClick={() => {
-                if(element.label === "Menu") {
-                    setIsOpen(true);
-                } else {
-                    element.route && navigate(element.route)
-                }
+          <div 
+            style={{
+              display: "flex",
+              alignItems: "center",
+              backgroundColor: showSearchExpanded ? "rgba(255, 255, 255, 0.3)" : "rgba(255, 255, 255, 0.2)",
+              borderRadius: "20px",
+              padding: "8px 15px",
+              transition: "all 0.3s",
+              cursor: "pointer",
+              minWidth: "200px"
             }}
-              style={{
-                cursor: element.route ? "pointer" : "default",
-                padding: "10px",
-                transition: "all 0.3s",
-                borderRadius: "10%",
-                ...element.style,
-                ...(index === 0 ? { fontSize: "26px" } : {}),
-              }}
-              onMouseEnter={(e) =>
-                (e.target.style.backgroundColor = "#444")
-              }
-              onMouseLeave={(e) =>
-                (e.target.style.backgroundColor = "transparent")
-              }
-            >
-              {element.label === "SearchBar" ? (
-                <input
-                  type="text"
-                  placeholder="Search..."
-                  style={{
-                    padding: "5px",
-                    borderRadius: "4px",
-                    border: "1px solid #ccc",
-                  }}
-                />
-              ) : (
-                element.label
-              )}
-            </li>
-          ))}
-        </ul>
-      </nav>
-    </>
+            onClick={() => setShowSearchExpanded(!showSearchExpanded)}
+          >
+            <span style={{ marginRight: "8px", color: "#ccc" }}>🔍</span>
+            <span style={{ color: "#aaa" }}>Search...</span>
+          </div>
+        </li>
+
+        {/* Expanded Search Panel */}
+        {showSearchExpanded && (
+          <li
+            ref={searchContainerRef}
+            style={{
+              position: "absolute",
+              top: "60px", 
+              right: "20px",
+              backgroundColor: "rgba(0, 0, 0, 0.9)",
+              padding: "20px",
+              borderRadius: "8px",
+              width: "400px",
+              zIndex: 101,
+              boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
+              listStyle: "none"
+            }}
+          >
+            <SearchBar onSearch={() => setShowSearchExpanded(false)} />
+          </li>
+        )}
+
+        {/* Menu Button */}
+        <li
+          onClick={() => setIsOpen(true)}
+          style={{
+            padding: "10px",
+            cursor: "pointer",
+            borderRadius: "10px",
+            marginLeft: "10px",
+          }}
+          onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)")}
+          onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
+        >
+          ☰
+        </li>
+      </ul>
+    </nav>
   );
 }

@@ -28,7 +28,7 @@ export function ModelsProvider({ children }) {
 
 export function useModels() {
   const context = useContext(ModelsContext);
-  console.log(context);
+  
   if (!context) {
     throw new Error('useModels must be used within a ModelsProvider');
   }
