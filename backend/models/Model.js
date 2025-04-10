@@ -11,6 +11,11 @@ const modelSchema = new mongoose.Schema({
         type: String,
         required: [true, 'Please add a model image'],
     },
+    price: {  
+        type: Number,
+        required: [true, 'Please add a base price'],
+        min: [0, 'Price must be at least 0']
+    },
     variants: [
         {
         type: mongoose.Schema.Types.ObjectId,

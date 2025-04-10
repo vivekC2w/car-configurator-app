@@ -131,44 +131,89 @@ exports.getModelByName = async (req, res) => {
     }
 }
 
- // @desc Search models by name, category, and price range
+ // @desc Search models by name and price range
 // @route GET /api/models/search
-exports.searchModels = async (req, res, next) => {
+exports.searchModels = async (req, res) => {
     try {
-      const { query, category, minPrice, maxPrice } = req.query;
- 
-      let searchQuery = {};
-      
-      // Text search
+      const { query, minPrice, maxPrice } = req.query;
+  
+      const pipeline = [];
+  
+      // Match models by name (text search)
       if (query) {
-        searchQuery.$or = [
-          { name: { $regex: query, $options: 'i' } },
-          { description: { $regex: query, $options: 'i' } }
-        ];
+        pipeline.push({
+          $match: {
+            name: { $regex: query, $options: 'i' }
+          }
+        });
       }
-      
-      // Category filter
-      if (category) {
-        searchQuery.category = category;
-      }
-      
-      // Price range filter
-      if (minPrice || maxPrice) {
-        searchQuery.price = {};
-        if (minPrice) searchQuery.price.$gte = Number(minPrice);
-        if (maxPrice) searchQuery.price.$lte = Number(maxPrice);
-      }
-      
-      const models = await Model.find(searchQuery)
-        .populate('variants')
-        .populate('accessories');
-      
-      res.status(200).json({
-        success: true,
-        count: models.length,
-        data: models
+  
+      // Lookup variants for each model
+      pipeline.push({
+        $lookup: {
+          from: 'variants',
+          let: { modelId: '$_id' },
+          pipeline: [
+            {
+              $match: {
+                $expr: {
+                  $and: [
+                    { $eq: ['$modelId', '$$modelId'] },
+                    ...(minPrice ? [{ $gte: ['$price', Number(minPrice)] }] : []),
+                    ...(maxPrice ? [{ $lte: ['$price', Number(maxPrice)] }] : [])
+                  ]
+                }
+              }
+            },
+            { $limit: 5 }
+          ],
+          as: 'variants'
+        }
       });
+  
+      // If price filter applied, ensure variants exist
+      if (minPrice || maxPrice) {
+        pipeline.push({
+          $match: {
+            variants: { $ne: [] }
+          }
+        });
+      }
+  
+      // Project model fields + filtered variants
+      pipeline.push({
+        $project: {
+          name: 1,
+          image: 1,
+          price: 1,
+          variantCount: {
+            $cond: {
+              if: { $isArray: '$variants' },
+              then: { $size: '$variants' },
+              else: 0
+            }
+          },
+          variants: {
+            $map: {
+              input: '$variants',
+              as: 'variant',
+              in: {
+                name: '$$variant.name',
+                price: '$$variant.price',
+                range: '$$variant.range',
+                acceleration: '$$variant.acceleration'
+              }
+            }
+          }
+        }
+      });
+  
+      const models = await Model.aggregate(pipeline);
+  
+      res.json({ success: true, data: models });
     } catch (err) {
-      next(err);
+      console.error(err);
+      res.status(500).json({ success: false, error: err.message });
     }
   };
+  

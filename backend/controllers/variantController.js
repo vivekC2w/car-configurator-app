@@ -3,6 +3,7 @@ const Model = require('../models/Model');
 const Color = require('../models/Color');
 const Accessory = require('../models/Accessory');
 const Feature = require('../models/Feature');
+const Category = require('../models/Category');
 
 // @desc Create a new variant
 // @route POST /api/variants
@@ -137,43 +138,66 @@ exports.deleteVariantsByModel = async (req, res) => {
       });
     }
   };
+  exports.searchVariants = async (req, res) => {
+    try {
+      const { query, minPrice, maxPrice, color, category } = req.query;
+      
+      // Base query - no modelId required
+      let searchQuery = {};
+      
+      // Text search on variant name
+      if (query) {
+        searchQuery.name = { $regex: query, $options: 'i' };
+      }
+      
+      // Price range filter
+      if (minPrice || maxPrice) {
+        searchQuery.price = {};
+        if (minPrice) searchQuery.price.$gte = Number(minPrice);
+        if (maxPrice) searchQuery.price.$lte = Number(maxPrice);
+      }
+      
+      // Color filter
+      if (color) {
+        const colorDocs = await Color.find({ name: { $regex: color, $options: 'i' } });
+        if (colorDocs.length > 0) {
+          searchQuery.colors = { $in: colorDocs.map(c => c._id) };
+        } else {
+          return res.json({ success: true, data: [] });
+        }
+      }
+      
+      const variants = await Variant.find(searchQuery)
+        .populate({
+          path: 'colors',
+          match: color ? { name: { $regex: color, $options: 'i' } } : {}
+        })
+        .populate({
+          path: 'accessories',
+          match: category ? { category: { $regex: category, $options: 'i' } } : {}
+        })
+        .populate({
+          path: 'features',
+          match: category ? { category: { $regex: category, $options: 'i' } } : {}
+        })
+        .populate('modelId', 'name image'); // Include basic model info
 
-// @desc Search variants by name, model, price range, and accessories
-// @route GET /api/variants/search 
-
-exports.searchVariants = async (req, res, next) => {
-  try {
-    const { query, modelId, minPrice, maxPrice } = req.query;
-    
-    let searchQuery = {};
-    
-    if (query) {
-      searchQuery.$or = [
-        { name: { $regex: query, $options: 'i' } },
-        { description: { $regex: query, $options: 'i' } }
-      ];
+      // Apply category filter if specified
+      const filteredVariants = category
+        ? variants.filter(v =>
+            (v.accessories && v.accessories.length > 0) ||
+            (v.features && v.features.length > 0)
+          )
+        : variants;
+      
+      res.json({ 
+        success: true, 
+        data: filteredVariants 
+      });
+    } catch (err) {
+      res.status(500).json({ 
+        success: false, 
+        error: err.message 
+      });
     }
-    
-    if (modelId) {
-      searchQuery.model = modelId;
-    }
-    
-    if (minPrice || maxPrice) {
-      searchQuery.price = {};
-      if (minPrice) searchQuery.price.$gte = Number(minPrice);
-      if (maxPrice) searchQuery.price.$lte = Number(maxPrice);
-    }
-    
-    const variants = await Variant.find(searchQuery)
-      .populate('colors')
-      .populate('accessories');
-    
-    res.status(200).json({
-      success: true,
-      count: variants.length,
-      data: variants
-    });
-  } catch (err) {
-    next(err);
-  }
-};
+  };

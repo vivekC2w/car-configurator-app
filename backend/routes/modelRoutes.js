@@ -3,10 +3,10 @@ const { createModel, uploadModelImage, getModels, getModel, getModelVariants, ge
 
 const router = express.Router();
 
+router.get('/search', searchModels);
 router.route('/').post(uploadModelImage, createModel).get(getModels);
 router.route('/:id').get(getModel);
 router.route('/:id/variants').get(getModelVariants);
 router.route('/name/:name').get(getModelByName);
-router.route('/search').get(searchModels);
 
 module.exports = router;

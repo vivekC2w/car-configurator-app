@@ -179,45 +179,51 @@ exports.deleteAccessory = async (req, res) => {
     }
 };
 
-exports.searchAccessories = async (req, res) => {
+// @desc    Search accessories
+// @route   GET /api/accessories/search
+exports.searchAccessories = async (req, res, next) => {
     try {
-        const { query, category, minPrice, maxPrice } = req.query;
-
-        let searchQuery = {};
-
-        // Text search
-        if (query) {
-          searchQuery.$or = [
-            { name: { $regex: query, $options: "i" } },
-            { description: { $regex: query, $options: "i" } },
-          ];
-        }
-
-        // Category filter
-        if (category) {
-          searchQuery.category = category;
-        }
-
-        // Price range filter
-        if (minPrice || maxPrice) {
-          searchQuery.price = {};
-          if (minPrice) searchQuery.price.$gte = Number(minPrice);
-          if (maxPrice) searchQuery.price.$lte = Number(maxPrice);
-        }
-
-        const accessories = await Accessory.find(searchQuery).populate(
-          "compatibleVariants"
+      const { query, category, minPrice, maxPrice, variantId } = req.query;
+      
+      let searchQuery = {};
+      
+      // Text search on name
+      if (query) {
+        searchQuery.name = { $regex: query, $options: 'i' };
+      }
+      
+      // Category filter
+      if (category) {
+        const validCategories = ['Exterior', 'Interior', 'Performance', 'Technology'];
+        const matchedCategory = validCategories.find(c => 
+            c.toLowerCase() === category.toLowerCase()
         );
-
-        res.status(200).json({
-          success: true,
-          count: accessories.length,
-          data: accessories,
-        });
-    } catch (error) {
-        res.status(400).json({
-          success: false,
-          message: error.message,
-        });
+        if (matchedCategory) {
+            searchQuery.category = matchedCategory;
+        }
+      }
+      
+      // Price range filter
+      if (minPrice || maxPrice) {
+        searchQuery.price = {};
+        if (minPrice) searchQuery.price.$gte = Number(minPrice);
+        if (maxPrice) searchQuery.price.$lte = Number(maxPrice);
+      }
+      
+      // Filter by compatible variant
+      if (variantId) {
+        searchQuery.compatibleVariants = variantId;
+      }
+      
+      const accessories = await Accessory.find(searchQuery)
+      .populate('compatibleVariants', 'name price');
+      
+      res.status(200).json({
+        success: true,
+        count: accessories.length,
+        data: accessories
+      });
+    } catch (err) {
+      next(err);
     }
 };
