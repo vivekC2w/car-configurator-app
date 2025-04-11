@@ -31,14 +31,14 @@ export default function AccessoryCard({ accessory }) {
           {accessory.name}
         </h4>
         <p style={{ 
-          color: '#4CAF50',
+          color: '#2EFF2E',
           fontWeight: 'bold',
           margin: '5px 0'
         }}>
           ₹{accessory.price?.toLocaleString()}
         </p>
         <p style={{ 
-          color: '#aaa',
+          color: '#fff',
           fontSize: '0.9rem',
           margin: '5px 0'
         }}>

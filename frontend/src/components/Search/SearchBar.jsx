@@ -35,7 +35,6 @@ export default function SearchBar({ onSearch }) {
     
     try {
       let results;
-      console.log("Active Tabs->", activeTab);
       if (activeTab === 'models') {
         results = await searchModels(searchQuery, {
           minVariantPrice: filters.minPrice,
@@ -45,7 +44,10 @@ export default function SearchBar({ onSearch }) {
         setSearchResults({ models: results.data || [], variants: [], accessories: [] });
       } 
       else if (activeTab === 'variants') {
-        results = await searchVariants(searchQuery, filters);
+        results = await searchVariants(searchQuery,  {
+          minPrice: filters.minPrice,
+          maxPrice: filters.maxPrice
+        });
         setSearchResults({ variants: results.data || [], models: [], accessories: [] });
       }
       else if (activeTab === 'accessories') {
@@ -70,7 +72,7 @@ export default function SearchBar({ onSearch }) {
     }, 500);
 
     return () => clearTimeout(delayDebounce);
-  }, [searchQuery, filters, activeTab]);
+  }, [searchQuery, JSON.stringify(filters), activeTab]);
 
   return (
     <div onClick={(e) => e.stopPropagation()}>

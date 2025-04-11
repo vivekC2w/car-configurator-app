@@ -109,19 +109,18 @@ export default function CarConfigurator({ modelName }) {
           zIndex: 2,
           height: "100vh",
           overflowY: "auto",
-          padding: "40px",
+          padding: "30px",
           paddingBottom: "80px",
         }}
       >
         <h1
           style={{
             fontSize: "2.5rem",
-            marginBottom: "1.5rem",
+            marginBottom: "1.2rem",
             textAlign: "center",
             position: "sticky",
             top: 0,
-            // backgroundColor: "rgba(0,0,0,0.7)",
-            padding: "20px",
+            padding: "10px",
             zIndex: 3,
             backdropFilter: "blur(5px)",
           }}

@@ -28,8 +28,8 @@ export default function SearchResults() {
   }
   
   return (
-    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto' }}>
-      <h2 style={{ marginBottom: '30px' }}>Search Results</h2>
+    <div style={{ padding: '5px', maxWidth: '1200px', margin: '0 auto' }}>
+      <h2 style={{ marginBottom: '5px' }}>Search Results</h2>
       
       {hasModels && (
         <section style={{ marginBottom: '40px' }}>
