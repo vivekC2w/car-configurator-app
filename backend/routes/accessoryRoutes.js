@@ -4,7 +4,7 @@ const { createAccessory, getAccessories, getAccessoriesByVariantId, getAccessory
 
 const upload = require('../middleware/upload');
 
-router.route('/search').get(searchAccessories);
+router.get('/search', searchAccessories);
 
 router.route('/').post(upload.single('image'), createAccessory).get(getAccessories);
 

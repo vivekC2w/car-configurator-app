@@ -139,7 +139,7 @@ exports.searchModels = async (req, res) => {
   
       const pipeline = [];
   
-      // Match models by name (text search)
+      // Match models by name
       if (query) {
         pipeline.push({
           $match: {
