@@ -72,7 +72,7 @@ exports.deleteVariantsByModel = async (req, res) => {
       // 1. Find all variants for this model
       const variants = await Variant.find({ modelId });
   
-    //   // 2. Delete all associated data (colors, accessories, features)
+     // 2. Delete all associated data (colors, accessories, features)
       const variantIds = variants.map(v => v._id);
       
       await Promise.all([

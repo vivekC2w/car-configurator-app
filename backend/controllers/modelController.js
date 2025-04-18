@@ -135,11 +135,11 @@ exports.getModelByName = async (req, res) => {
 // @route GET /api/models/search
 exports.searchModels = async (req, res) => {
     try {
-      const { query, minPrice, maxPrice } = req.query;
-  
+      const { query, minVariantPrice, maxVariantPrice } = req.query;
+      console.log(query, minVariantPrice, maxVariantPrice);
       const pipeline = [];
   
-      // Match models by name
+      //1.  Match models by name
       if (query) {
         pipeline.push({
           $match: {
@@ -147,40 +147,31 @@ exports.searchModels = async (req, res) => {
           }
         });
       }
-  
-      // Lookup variants for each model
+
+      // 2. Apply minVariantPrice/maxVariantPrice filter on MODEL price
+      const priceFilter = {};
+      if (minVariantPrice) priceFilter.$gte = Number(minVariantPrice);
+      if (maxVariantPrice) priceFilter.$lte = Number(maxVariantPrice);
+
+      if (minVariantPrice || maxVariantPrice) {
+        pipeline.push({
+          $match: {
+            price: priceFilter
+          }
+        });
+      }
+
+      // 3. Lookup variants for each model
       pipeline.push({
         $lookup: {
           from: 'variants',
-          let: { modelId: '$_id' },
-          pipeline: [
-            {
-              $match: {
-                $expr: {
-                  $and: [
-                    { $eq: ['$modelId', '$$modelId'] },
-                    ...(minPrice ? [{ $gte: ['$price', Number(minPrice)] }] : []),
-                    ...(maxPrice ? [{ $lte: ['$price', Number(maxPrice)] }] : [])
-                  ]
-                }
-              }
-            },
-            { $limit: 5 }
-          ],
+          localField: '_id',
+          foreignField: 'modelId',
           as: 'variants'
         }
       });
   
-      // If price filter applied, ensure variants exist
-      if (minPrice || maxPrice) {
-        pipeline.push({
-          $match: {
-            variants: { $ne: [] }
-          }
-        });
-      }
-  
-      // Project model fields + filtered variants
+      // Project final ouput
       pipeline.push({
         $project: {
           name: 1,
