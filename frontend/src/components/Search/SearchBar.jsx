@@ -40,7 +40,6 @@ export default function SearchBar({ onSearch }) {
           minVariantPrice: filters.minPrice,
           maxVariantPrice: filters.maxPrice
         });
-        console.log("Results->", results);
         setSearchResults({ models: results.data || [], variants: [], accessories: [] });
       } 
       else if (activeTab === 'variants') {
@@ -69,7 +68,7 @@ export default function SearchBar({ onSearch }) {
   useEffect(() => {
     const delayDebounce = setTimeout(() => {
       if (searchQuery) handleSearch();
-    }, 500);
+    }, 1500);
 
     return () => clearTimeout(delayDebounce);
   }, [searchQuery, JSON.stringify(filters), activeTab]);

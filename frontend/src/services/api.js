@@ -106,12 +106,11 @@ export const fetchModels = async () => {
     }
   };
   
-  export const searchVariants = async (modelId, filters = {}) => {
+  export const searchVariants = async (query, filters = {}) => {
     try {
-      const params = new URLSearchParams();
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) params.append(key, value);
-      });
+      const params = new URLSearchParams({ query });
+      if (filters.minPrice) params.append('minPrice', filters.minPrice);
+      if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
       
       const response = await api.get(`/variants/search/?${params}`);
       return response.data;
@@ -123,9 +122,9 @@ export const fetchModels = async () => {
   export const searchAccessories = async (query, filters = {}) => {
     try {
       const params = new URLSearchParams({ query });
-      Object.entries(filters).forEach(([key, value]) => {
-        if (value) params.append(key, value);
-      });
+      if (filters.minPrice) params.append('minPrice', filters.minPrice);
+      if (filters.maxPrice) params.append('maxPrice', filters.maxPrice);
+      if (filters.category) params.append('category', filters.category);
       
       const response = await api.get(`/accessories/search?${params}`);
       return response.data;

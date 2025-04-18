@@ -41,7 +41,7 @@ export default function ModelCard({ model }) {
             fontWeight: 'bold',
             textShadow: '0 0 2px white'
           }}>
-            Starting at ₹{model.variants[0].price?.toLocaleString()}
+            Starting at ₹{model?.price?.toLocaleString()}
           </span>
           <span style={{
             color: '#ccc',
