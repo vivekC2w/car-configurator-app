@@ -109,7 +109,7 @@ export default function CarConfigurator({ modelName }) {
           zIndex: 2,
           height: "100vh",
           overflowY: "auto",
-          padding: "30px",
+          padding: "15px",
           paddingBottom: "80px",
         }}
       >
@@ -130,7 +130,7 @@ export default function CarConfigurator({ modelName }) {
 
         {/* Variant selection */}
         <div style={{ marginBottom: "40px" }}>
-          <h2 style={{ fontSize: "1.5rem", marginBottom: "1rem" }}>
+          <h2 style={{ fontSize: "1.2rem", marginBottom: "1rem" }}>
             Select Variant:
           </h2>
           <div style={{ display: "flex", flexWrap: "wrap", gap: "10px" }}>
