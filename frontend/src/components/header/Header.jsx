@@ -46,6 +46,7 @@ export default function Header({ setIsOpen }) {
       <ul
         style={{
           display: "flex",
+          flexWrap: "wrap",
           alignItems: "center",
           padding: "10px",
           margin: 0,
@@ -58,28 +59,43 @@ export default function Header({ setIsOpen }) {
         }}
       >
         {/* Logo and Model Links */}
-        {navElements.map((element, index) => (
-          <li
-            key={index}
-            onClick={() => navigate(element.route)}
-            style={{
-              cursor: "pointer",
-              padding: "10px",
-              transition: "all 0.3s",
-              borderRadius: "10px",
-              ...element.style,
-              ...(index === 0 && {
-                fontSize: "26px",
-                fontWeight: "bold",
-                fontFamily: "'Segoe UI', sans-serif",
-              }),
-            }}
-            onMouseEnter={(e) => (e.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)")}
-            onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
-          >
-            {element.label}
-          </li>
-        ))}
+        <li
+        onClick={() => navigate(navElements[0].route)}
+        style={{
+          cursor: "pointer",
+          padding: "10px",
+          transition: "all 0.3s",
+          borderRadius: "10px",
+          fontSize: "clamp(18px, 4vw, 26px)", 
+          fontWeight: "bold",
+          fontFamily: "'Segoe UI', sans-serif",
+          marginRight: "auto", 
+          whiteSpace: "nowrap",
+        }}
+        onMouseEnter={(e) => (e.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)")}
+        onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+      >
+        {navElements[0].label}
+      </li>
+
+        {navElements.slice(1).map((element, index) => (
+        <li
+          key={index}
+          onClick={() => navigate(element.route)}
+          style={{
+            cursor: "pointer",
+            padding: "10px",
+            transition: "all 0.3s",
+            borderRadius: "10px",
+            ...element.style,
+            display: window.innerWidth < 768 ? "none" : "block", // Hide on mobile
+          }}
+          onMouseEnter={(e) => (e.target.style.backgroundColor = "rgba(255, 255, 255, 0.1)")}
+          onMouseLeave={(e) => (e.target.style.backgroundColor = "transparent")}
+        >
+          {element.label}
+        </li>
+      ))}
 
         {/* Search Trigger */}
         <li 
@@ -88,7 +104,8 @@ export default function Header({ setIsOpen }) {
             marginLeft: "auto",
             position: "relative",
             display: "flex",
-            alignItems: "center"
+            alignItems: "center",
+            marginLeft: window.innerWidth < 768 ? "auto" : "0",
           }}
         >
           <div 
@@ -100,12 +117,13 @@ export default function Header({ setIsOpen }) {
               padding: "8px 15px",
               transition: "all 0.3s",
               cursor: "pointer",
-              minWidth: "200px"
+              minWidth: window.innerWidth < 768 ? "40px" : "200px", 
+              justifyContent: window.innerWidth < 768 ? "center" : "flex-start",
             }}
             onClick={() => setShowSearchExpanded(!showSearchExpanded)}
           >
-            <span style={{ marginRight: "8px", color: "#ccc" }}>🔍</span>
-            <span style={{ color: "#aaa" }}>Search...</span>
+            <span style={{ marginRight: window.innerWidth < 768 ? 0 : "8px", color: "#ccc" }}>🔍</span>
+            {window.innerWidth >= 768 && <span style={{ color: "#aaa" }}>Search...</span>}
           </div>
         </li>
 
@@ -116,11 +134,11 @@ export default function Header({ setIsOpen }) {
             style={{
               position: "absolute",
               top: "60px", 
-              right: "20px",
+              right: window.innerWidth < 768 ? "10px" : "20px",
               backgroundColor: "rgba(0, 0, 0, 0.9)",
               padding: "20px",
               borderRadius: "8px",
-              width: "400px",
+              width: window.innerWidth < 768 ? "calc(100% - 20px)" : "400px",
               zIndex: 101,
               boxShadow: "0 4px 8px rgba(0, 0, 0, 0.3)",
               listStyle: "none"
@@ -138,6 +156,7 @@ export default function Header({ setIsOpen }) {
             cursor: "pointer",
             borderRadius: "10px",
             marginLeft: "10px",
+            display: window.innerWidth < 768 ? "block" : "none",
           }}
           onMouseEnter={(e) => (e.currentTarget.style.backgroundColor = "rgba(255, 255, 255, 0.1)")}
           onMouseLeave={(e) => (e.currentTarget.style.backgroundColor = "transparent")}
@@ -145,6 +164,6 @@ export default function Header({ setIsOpen }) {
           ☰
         </li>
       </ul>
-    </nav>
+  </nav>
   );
 }
