@@ -2,6 +2,7 @@ import { useState, useRef, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { useModels } from "../../context/ModelsContext";
 import SearchBar from "../../components/Search/SearchBar";
+import { useSearch } from "../../context/SearchContext";
 
 export default function Header({ setIsOpen }) {
   const navigate = useNavigate();
@@ -10,6 +11,7 @@ export default function Header({ setIsOpen }) {
   const [windowWidth, setWindowWidth] = useState(window.innerWidth);
   const searchContainerRef = useRef(null);
   const searchTriggerRef = useRef(null);
+  const { setSearchQuery } = useSearch();
 
   // Handle window resize
   useEffect(() => {
@@ -35,6 +37,7 @@ export default function Header({ setIsOpen }) {
         !searchTriggerRef.current.contains(event.target)
       ) {
         setShowSearchExpanded(false);
+        setSearchQuery('');
       }
     };
 

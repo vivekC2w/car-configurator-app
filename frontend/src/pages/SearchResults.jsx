@@ -6,7 +6,7 @@ import AccessoryCard from '../components/Cards/AccessoryCard';
 
 export default function SearchResults() {
   const { searchResults, isSearching } = useSearch();
-  console.log(searchResults);
+  
   if (isSearching) return <LoadingSpinner />;
   
   // Only show sections that have results
@@ -19,7 +19,12 @@ export default function SearchResults() {
       <div style={{ 
         padding: '40px', 
         textAlign: 'center',
-        color: '#666'
+        color: '#666',
+        minHeight: 'calc(100vh - 200px)',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'center',
+        alignItems: 'center'
       }}>
         <h2>No results found</h2>
         <p>Try adjusting your search query or filters</p>
@@ -28,9 +33,10 @@ export default function SearchResults() {
   }
   
   return (
-    <div style={{ padding: '5px', maxWidth: '1200px', margin: '0 auto' }}>
-      <h2 style={{ marginBottom: '5px' }}>Search Results</h2>
+    <div style={{ padding: '20px', maxWidth: '1200px', margin: '0 auto', minHeight: '100vh', display: 'flex', flexDirection: 'column' }}>
+      <h2 style={{ marginBottom: '20px', position: 'sticky', top: '0', zIndex: '10', padding: '10px 0', boxShadow: '0 2px 5px rgba(0,0,0,0.1)' }}>Search Results</h2>
       
+      <div style={{ flex: 1, overflowY: 'auto', paddingBottom: '60px' }}>
       {hasModels && (
         <section style={{ marginBottom: '40px' }}>
           <h3>Models ({searchResults.models.length})</h3>
@@ -78,6 +84,7 @@ export default function SearchResults() {
           </div>
         </section>
       )}
+      </div>
     </div>
   );
 }

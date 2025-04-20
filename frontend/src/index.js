@@ -7,6 +7,7 @@ import { ModelsProvider } from "./context/ModelsContext";
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { SearchProvider } from "./context/SearchContext";
 import SearchResults from "./pages/SearchResults";
+import LoadingSpinner from "./components/ReusableComponents/LoadingSpinner/LoadingSpinner";
 
 const HomePage = React.lazy(() => import("./pages/HomePage"));
 const ModelSPage = React.lazy(() => import("./pages/ModelSPage"));
@@ -38,7 +39,7 @@ const router = createBrowserRouter([
     path: "/modelS",
     element: (
       <App>
-        <React.Suspense fallback={<div>Loading...</div>}>
+        <React.Suspense fallback={<LoadingSpinner/>}>
           <ModelSPage />
         </React.Suspense>
       </App>
@@ -48,7 +49,7 @@ const router = createBrowserRouter([
     path: "/modelX",
     element: (
       <App>
-        <React.Suspense fallback={<div>Loading...</div>}>
+        <React.Suspense fallback={<LoadingSpinner/>}>
           <ModelXPage />
         </React.Suspense>
       </App>
@@ -58,7 +59,7 @@ const router = createBrowserRouter([
     path: "/modelY",
     element: (
       <App>
-        <React.Suspense fallback={<div>Loading...</div>}>
+        <React.Suspense fallback={<LoadingSpinner/>}>
           <ModelYPage />
         </React.Suspense>
       </App>
@@ -68,7 +69,7 @@ const router = createBrowserRouter([
     path: "/cybertruck",
     element: (
       <App>
-        <React.Suspense fallback={<div>Loading...</div>}>
+        <React.Suspense fallback={<LoadingSpinner/>}>
           <CyberTruckPage />
         </React.Suspense>
       </App>
@@ -78,7 +79,7 @@ const router = createBrowserRouter([
     path: "/search",
     element: (
       <App>
-        <React.Suspense fallback={<div>Loading...</div>}>
+        <React.Suspense fallback={<LoadingSpinner/>}>
           <SearchResults />
         </React.Suspense>
       </App>
