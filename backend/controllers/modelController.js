@@ -136,7 +136,7 @@ exports.getModelByName = async (req, res) => {
 exports.searchModels = async (req, res) => {
     try {
       const { query, minVariantPrice, maxVariantPrice } = req.query;
-      console.log(query, minVariantPrice, maxVariantPrice);
+  
       const pipeline = [];
   
       //1.  Match models by name
